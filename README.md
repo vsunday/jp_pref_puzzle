@@ -1,1 +1,1 @@
-# august_training
+# jp_pref_puzzle
