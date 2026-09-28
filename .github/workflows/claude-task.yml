@@ -1,0 +1,123 @@
+name: Claude task from Notion
+
+on:
+  workflow_dispatch:
+    inputs:
+      notion_page_id:
+        description: Notion page that requested this task
+        required: true
+        type: string
+      branch:
+        description: Existing branch to change and push
+        required: true
+        type: string
+      instruction:
+        description: Implementation instruction from Notion
+        required: true
+        type: string
+      author_name:
+        description: Git author name mapped from Notion Requested by
+        required: true
+        type: string
+      author_email:
+        description: Git author email mapped from Notion Requested by
+        required: true
+        type: string
+
+# This MVP pushes directly to an existing, non-protected test branch.
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the requested branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Claude Code
+        run: npm install --global @anthropic-ai/claude-code
+
+      - name: Implement the task with Claude Code
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          INSTRUCTION: ${{ inputs.instruction }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          prompt="$(cat <<'PROMPT'
+Read CLAUDE.md if it exists.
+Implement the following task in this repository:
+
+PROMPT
+)"
+          prompt+="$INSTRUCTION"
+          prompt+="$(cat <<'PROMPT'
+
+
+Make the required file changes. Do not commit or push; the workflow will do that.
+PROMPT
+)"
+          claude --print --dangerously-skip-permissions "$prompt"
+
+      - name: Require a file change
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "Claude Code produced no file changes." >&2
+            exit 1
+          fi
+
+      - name: Commit and push changes
+        id: commit_and_push
+        env:
+          AUTHOR_NAME: ${{ inputs.author_name }}
+          AUTHOR_EMAIL: ${{ inputs.author_email }}
+          NOTION_PAGE_ID: ${{ inputs.notion_page_id }}
+          BRANCH: ${{ inputs.branch }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "$AUTHOR_NAME"
+          git config user.email "$AUTHOR_EMAIL"
+          git add -A
+          git commit -m "Claude task from Notion" -m "Notion-Page-ID: $NOTION_PAGE_ID"
+          git push origin "HEAD:$BRANCH"
+          sha="$(git rev-parse HEAD)"
+          echo "commit_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${sha}" >> "$GITHUB_OUTPUT"
+
+      - name: Report result to the Worker
+        if: always()
+        env:
+          RESULT_CALLBACK_URL: ${{ secrets.RESULT_CALLBACK_URL }}
+          RESULT_CALLBACK_SECRET: ${{ secrets.RESULT_CALLBACK_SECRET }}
+          NOTION_PAGE_ID: ${{ inputs.notion_page_id }}
+          COMMIT_URL: ${{ steps.commit_and_push.outputs.commit_url }}
+          COMMIT_SUCCEEDED: ${{ steps.commit_and_push.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$COMMIT_SUCCEEDED" == "true" ]]; then
+            success=true
+            result="$COMMIT_URL"
+          else
+            success=false
+            result="Workflow failed. See ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          fi
+
+          payload="$(SUCCESS="$success" RESULT="$result" node -e 'console.log(JSON.stringify({notion_page_id: process.env.NOTION_PAGE_ID, success: process.env.SUCCESS === "true", result: process.env.RESULT}))')"
+          curl --fail-with-body --silent --show-error \
+            --request POST "$RESULT_CALLBACK_URL" \
+            --header 'content-type: application/json' \
+            --header "x-result-callback-secret: $RESULT_CALLBACK_SECRET" \
+            --data "$payload"
