@@ -54,19 +54,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          prompt="$(cat <<'PROMPT'
-Read CLAUDE.md if it exists.
-Implement the following task in this repository:
-
-PROMPT
-)"
+          prompt=$'Read CLAUDE.md if it exists.\nImplement the following task in this repository:\n\n'
           prompt+="$INSTRUCTION"
-          prompt+="$(cat <<'PROMPT'
-
-
-Make the required file changes. Do not commit or push; the workflow will do that.
-PROMPT
-)"
+          prompt+=$'\n\nMake the required file changes. Do not commit or push; the workflow will do that.'
           claude --print --dangerously-skip-permissions "$prompt"
 
       - name: Require a file change
