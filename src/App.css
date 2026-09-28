@@ -1,0 +1,6 @@
+.app {
+  display: flex;
+  place-content: center;
+  place-items: center;
+  flex-grow: 1;
+}
