@@ -49,11 +49,19 @@ jobs:
 
       - name: Implement the task with Claude Code
         env:
+          # OAuth is preferred when configured. Leave ANTHROPIC_API_KEY in
+          # place as a fallback for repositories that do not use OAuth.
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           INSTRUCTION: ${{ inputs.instruction }}
         shell: bash
         run: |
           set -euo pipefail
+          # Claude Code can authenticate with either credential. Prefer the
+          # long-lived OAuth token when both repository secrets are present.
+          if [[ -n "$CLAUDE_CODE_OAUTH_TOKEN" ]]; then
+            unset ANTHROPIC_API_KEY
+          fi
           prompt=$'Read CLAUDE.md if it exists.\nImplement the following task in this repository:\n\n'
           prompt+="$INSTRUCTION"
           prompt+=$'\n\nMake the required file changes. Do not commit or push; the workflow will do that.'
