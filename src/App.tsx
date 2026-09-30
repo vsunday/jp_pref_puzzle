@@ -10,9 +10,11 @@ type Phase = 'idle' | 'playing' | 'complete'
 
 const TOTAL = prefectures.length
 
+const solvedOffsets = (): Offsets => Object.fromEntries(prefectures.map((p) => [p.id, { x: 0, y: 0 }]))
+
 function App() {
   const [phase, setPhase] = useState<Phase>('idle')
-  const [offsets, setOffsets] = useState<Offsets>(() => scatterPieces())
+  const [offsets, setOffsets] = useState<Offsets>(solvedOffsets)
   const [placed, setPlaced] = useState<ReadonlySet<number>>(new Set())
   const [startedAt, setStartedAt] = useState(0)
   const [elapsedMs, setElapsedMs] = useState(0)
@@ -41,7 +43,7 @@ function App() {
 
   const stop = useCallback(() => {
     setPhase('idle')
-    setOffsets(scatterPieces())
+    setOffsets(solvedOffsets())
     setPlaced(new Set())
     setElapsedMs(0)
     setStartedAt(0)

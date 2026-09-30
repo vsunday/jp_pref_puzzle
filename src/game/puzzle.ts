@@ -21,7 +21,7 @@ export const VIEW_BOX = {
 }
 
 /** Soft pastel colors; index = Prefecture.color. */
-export const PALETTE = ['#f4a3a6', '#f7e08a', '#a3dcb8', '#f8c39a', '#c9b0e6', '#f3f3f3']
+export const PALETTE = ['#f4a3a6', '#f7e08a', '#a3dcb8', '#f8c39a', '#c9b0e6']
 
 /**
  * Assign a color index to every prefecture so that neighbours differ while
