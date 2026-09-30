@@ -3,6 +3,7 @@ import './App.css'
 import Board from './components/Board'
 import CompleteModal from './components/CompleteModal'
 import { prefectures } from './data/prefectures'
+import { LANGUAGES, STRINGS, type Language } from './i18n'
 import { formatTime, scatterPieces, type Offsets, type Point } from './game/puzzle'
 
 type Phase = 'idle' | 'playing' | 'complete'
@@ -15,6 +16,14 @@ function App() {
   const [placed, setPlaced] = useState<ReadonlySet<number>>(new Set())
   const [startedAt, setStartedAt] = useState(0)
   const [elapsedMs, setElapsedMs] = useState(0)
+  const [language, setLanguage] = useState<Language>('ja')
+  const [showLabels, setShowLabels] = useState(false)
+  const t = STRINGS[language]
+
+  useEffect(() => {
+    document.title = t.title
+    document.documentElement.lang = language === 'en' ? 'en' : 'ja'
+  }, [t.title, language])
 
   useEffect(() => {
     if (phase !== 'playing') return
@@ -52,22 +61,38 @@ function App() {
   return (
     <div className="app">
       <header className="toolbar">
-        <h1>Japan Prefectural Puzzle</h1>
+        <h1>{t.title}</h1>
         <div className="status">
-          <span className="stat" aria-label="Elapsed time">
+          <label className="toggle">
+            <input type="checkbox" checked={showLabels} onChange={(e) => setShowLabels(e.target.checked)} />
+            {t.labels}
+          </label>
+          <div className="lang" role="group" aria-label={t.language}>
+            {LANGUAGES.map((l) => (
+              <button
+                key={l.value}
+                type="button"
+                className={`lang-btn${language === l.value ? ' active' : ''}`}
+                aria-pressed={language === l.value}
+                onClick={() => setLanguage(l.value)}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
+          <span className="stat" aria-label={t.elapsed}>
             {formatTime(elapsedMs)}
           </span>
           <span className="stat">
             {placed.size} / {TOTAL}
           </span>
-          <button type="button" className="primary" onClick={start}>
-            {phase === 'idle' ? 'Start game' : 'Restart'}
-          </button>
+          {phase !== 'idle' && (
+            <button type="button" className="primary" onClick={start}>
+              {t.restart}
+            </button>
+          )}
         </div>
       </header>
-      {phase === 'idle' && (
-        <p className="hint">Press &quot;Start game&quot;, then drag each piece to its place on the map.</p>
-      )}
       <main className="stage">
         <Board
           offsets={offsets}
@@ -75,9 +100,19 @@ function App() {
           interactive={phase === 'playing'}
           onMove={handleMove}
           onPlace={handlePlace}
+          showLabels={showLabels}
+          language={language}
         />
+        {phase === 'idle' && (
+          <div className="start-overlay">
+            <p className="hint">{t.hint}</p>
+            <button type="button" className="primary start-btn" onClick={start}>
+              {t.start}
+            </button>
+          </div>
+        )}
       </main>
-      {phase === 'complete' && <CompleteModal elapsedMs={elapsedMs} onPlayAgain={start} />}
+      {phase === 'complete' && <CompleteModal elapsedMs={elapsedMs} onPlayAgain={start} language={language} />}
     </div>
   )
 }

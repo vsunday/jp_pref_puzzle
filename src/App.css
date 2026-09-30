@@ -57,6 +57,7 @@ button.primary:hover {
 }
 
 .stage {
+  position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -68,15 +69,15 @@ button.primary:hover {
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  background: var(--code-bg);
-  border: 1px solid var(--border);
+  background: #4a90c2;
+  border: 1px solid #2f6f9f;
   border-radius: 8px;
 }
 
 .slot {
-  fill: var(--bg);
-  stroke: var(--text);
-  stroke-opacity: 0.35;
+  fill: #8fc0e0;
+  stroke: #1f5680;
+  stroke-opacity: 0.5;
   stroke-width: 0.8;
 }
 
@@ -129,4 +130,77 @@ button.primary:hover {
   color: var(--text-h);
   font-variant-numeric: tabular-nums;
   margin: 8px 0 16px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: #08060d;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 2.5px;
+  paint-order: stroke;
+  pointer-events: none;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.lang {
+  display: inline-flex;
+}
+
+.lang-btn {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border: 1px solid var(--accent-border);
+  background: transparent;
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.lang-btn:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.lang-btn:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+.lang-btn.active {
+  background: var(--accent-bg);
+  font-weight: 700;
+}
+
+.start-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(8, 20, 40, 0.6);
+  border-radius: 8px;
+  z-index: 5;
+}
+
+.start-overlay .hint {
+  color: #fff;
+  max-width: 34em;
+}
+
+.start-btn {
+  font-size: 1.3rem;
+  padding: 12px 32px;
+  background: var(--bg);
 }

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { prefectures } from '../data/prefectures'
 import type { Prefecture } from '../data/types'
+import { prefectureLabel, type Language } from '../i18n'
 import {
-  PALETTE,
+  pieceColor,
   VIEW_BOX,
   clampOffset,
   isNearHome,
@@ -17,6 +18,8 @@ interface BoardProps {
   interactive: boolean
   onMove: (id: number, offset: Point) => void
   onPlace: (id: number) => void
+  showLabels: boolean
+  language: Language
 }
 
 interface DragState {
@@ -29,7 +32,7 @@ interface DragState {
 /** Pieces smaller than this get an invisible fat outline so they are easy to grab. */
 const SMALL_PIECE = 45
 
-export default function Board({ offsets, placed, interactive, onMove, onPlace }: BoardProps) {
+export default function Board({ offsets, placed, interactive, onMove, onPlace, showLabels, language }: BoardProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const [drag, setDrag] = useState<DragState | null>(null)
   // The most recently touched piece is drawn last (on top).
@@ -111,12 +114,20 @@ export default function Board({ offsets, placed, interactive, onMove, onPlace }:
             <path
               key={p.id}
               d={p.d}
-              fill={PALETTE[p.color]}
+              fill={pieceColor(p)}
               className="piece locked"
               fillRule="evenodd"
               pointerEvents="none"
             />
           ))}
+        {showLabels &&
+          prefectures
+            .filter((p) => placed.has(p.id))
+            .map((p) => (
+              <text key={p.id} x={p.centroid.x} y={p.centroid.y} className="label">
+                {prefectureLabel(p, language)}
+              </text>
+            ))}
       </g>
       {/* Free pieces */}
       <g>
@@ -134,7 +145,12 @@ export default function Board({ offsets, placed, interactive, onMove, onPlace }:
               {small && (
                 <path d={p.d} fill="transparent" stroke="transparent" strokeWidth={14} pointerEvents="all" />
               )}
-              <path d={p.d} fill={PALETTE[p.color]} className="piece" fillRule="evenodd" />
+              <path d={p.d} fill={pieceColor(p)} className="piece" fillRule="evenodd" />
+              {showLabels && (
+                <text x={p.centroid.x} y={p.centroid.y} className="label">
+                  {prefectureLabel(p, language)}
+                </text>
+              )}
             </g>
           )
         })}
