@@ -71,7 +71,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --quiet; then
+          # `git diff` omits untracked files, which are the normal first
+          # changes in a new repository. Porcelain status includes those as
+          # well as staged and modified tracked files.
+          if [[ -z "$(git status --porcelain)" ]]; then
             echo "Claude Code produced no file changes." >&2
             exit 1
           fi
