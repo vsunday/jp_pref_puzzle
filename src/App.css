@@ -35,12 +35,6 @@
   text-align: center;
 }
 
-.hint {
-  margin: 0;
-  text-align: center;
-  font-size: 0.9rem;
-}
-
 button.primary {
   font: inherit;
   font-weight: 600;
@@ -69,16 +63,14 @@ button.primary:hover {
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  background: #4a90c2;
-  border: 1px solid #2f6f9f;
+  background: #cfe8f7;
+  border: 1px solid #9cc7e3;
   border-radius: 8px;
 }
 
 .slot {
-  fill: #8fc0e0;
-  stroke: #1f5680;
-  stroke-opacity: 0.5;
-  stroke-width: 0.8;
+  fill: #b5d8ee;
+  stroke: none;
 }
 
 .piece {
@@ -167,6 +159,10 @@ button.primary:hover {
   cursor: pointer;
 }
 
+.lang-btn:not(:first-child) {
+  border-left: 0;
+}
+
 .lang-btn:first-child {
   border-radius: 8px 0 0 8px;
 }
@@ -189,14 +185,9 @@ button.primary:hover {
   justify-content: center;
   gap: 16px;
   padding: 16px;
-  background: rgba(8, 20, 40, 0.6);
+  background: rgba(207, 232, 247, 0.85);
   border-radius: 8px;
   z-index: 5;
-}
-
-.start-overlay .hint {
-  color: #fff;
-  max-width: 34em;
 }
 
 .start-btn {

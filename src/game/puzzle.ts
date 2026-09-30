@@ -20,8 +20,8 @@ export const VIEW_BOX = {
   height: MAP_HEIGHT + PAD_Y * 2,
 }
 
-/** Simple, high-contrast colors; index = Prefecture.color. */
-export const PALETTE = ['#e5484d', '#f5c400', '#30a46c', '#f76b15', '#8e4ec6', '#f0f0f0']
+/** Soft pastel colors; index = Prefecture.color. */
+export const PALETTE = ['#f4a3a6', '#f7e08a', '#a3dcb8', '#f8c39a', '#c9b0e6', '#f3f3f3']
 
 /**
  * Assign a color index to every prefecture so that neighbours differ while

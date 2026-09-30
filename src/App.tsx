@@ -39,6 +39,16 @@ function App() {
     setPhase('playing')
   }, [])
 
+  const stop = useCallback(() => {
+    setPhase('idle')
+    setOffsets(scatterPieces())
+    setPlaced(new Set())
+    setElapsedMs(0)
+    setStartedAt(0)
+    setLanguage('ja')
+    setShowLabels(false)
+  }, [])
+
   const handleMove = useCallback((id: number, offset: Point) => {
     setOffsets((prev) => ({ ...prev, [id]: offset }))
   }, [])
@@ -63,22 +73,29 @@ function App() {
       <header className="toolbar">
         <h1>{t.title}</h1>
         <div className="status">
-          <label className="toggle">
-            <input type="checkbox" checked={showLabels} onChange={(e) => setShowLabels(e.target.checked)} />
-            {t.labels}
-          </label>
           <div className="lang" role="group" aria-label={t.language}>
             {LANGUAGES.map((l) => (
               <button
                 key={l.value}
                 type="button"
-                className={`lang-btn${language === l.value ? ' active' : ''}`}
-                aria-pressed={language === l.value}
-                onClick={() => setLanguage(l.value)}
+                className={`lang-btn${showLabels && language === l.value ? ' active' : ''}`}
+                aria-pressed={showLabels && language === l.value}
+                onClick={() => {
+                  setLanguage(l.value)
+                  setShowLabels(true)
+                }}
               >
                 {l.label}
               </button>
             ))}
+            <button
+              type="button"
+              className={`lang-btn${!showLabels ? ' active' : ''}`}
+              aria-pressed={!showLabels}
+              onClick={() => setShowLabels(false)}
+            >
+              {t.labelsOff}
+            </button>
           </div>
           <span className="stat" aria-label={t.elapsed}>
             {formatTime(elapsedMs)}
@@ -87,8 +104,8 @@ function App() {
             {placed.size} / {TOTAL}
           </span>
           {phase !== 'idle' && (
-            <button type="button" className="primary" onClick={start}>
-              {t.restart}
+            <button type="button" className="primary" onClick={stop}>
+              {t.stop}
             </button>
           )}
         </div>
@@ -105,7 +122,6 @@ function App() {
         />
         {phase === 'idle' && (
           <div className="start-overlay">
-            <p className="hint">{t.hint}</p>
             <button type="button" className="primary start-btn" onClick={start}>
               {t.start}
             </button>

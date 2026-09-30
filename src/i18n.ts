@@ -11,9 +11,8 @@ export const LANGUAGES: { value: Language; label: string }[] = [
 interface Strings {
   title: string
   start: string
-  restart: string
-  hint: string
-  labels: string
+  stop: string
+  labelsOff: string
   language: string
   complete: string
   allPlaced: string
@@ -25,9 +24,8 @@ export const STRINGS: Record<Language, Strings> = {
   ja: {
     title: '日本地図パズル',
     start: 'ゲームスタート',
-    restart: 'やり直す',
-    hint: '「ゲームスタート」を押して、各都道府県のピースを地図の正しい場所へドラッグしてください。',
-    labels: '都道府県名',
+    stop: 'ストップ',
+    labelsOff: 'なし',
     language: '言語',
     complete: 'クリア！',
     allPlaced: '47都道府県がすべて揃いました。',
@@ -37,9 +35,8 @@ export const STRINGS: Record<Language, Strings> = {
   hira: {
     title: 'にほんちずぱずる',
     start: 'ゲームすたーと',
-    restart: 'やりなおす',
-    hint: '「ゲームすたーと」をおして、ぴーすをちずのただしいばしょへドラッグしてね。',
-    labels: 'けんのなまえ',
+    stop: 'ストップ',
+    labelsOff: 'なし',
     language: 'ことば',
     complete: 'クリア！',
     allPlaced: '47とどうふけんがぜんぶそろいました。',
@@ -49,9 +46,8 @@ export const STRINGS: Record<Language, Strings> = {
   en: {
     title: 'Japan Prefectural Puzzle',
     start: 'Start game',
-    restart: 'Restart',
-    hint: 'Press "Start game", then drag each piece to its place on the map.',
-    labels: 'Prefecture names',
+    stop: 'Stop',
+    labelsOff: 'no',
     language: 'Language',
     complete: 'Complete!',
     allPlaced: 'All 47 prefectures are in place.',
